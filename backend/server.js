@@ -1,17 +1,7 @@
-const path = require('path');
-
-// Serve static files from the frontend build
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// Catch-all route to serve React app for all other routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
-
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path'); // moved up
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
@@ -25,10 +15,19 @@ app.use(express.json());
 // ✅ Serve uploaded resume files
 app.use('/uploads', express.static('uploads'));
 
+// ✅ Your API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/auth', uploadRoutes); 
 app.use('/api/jobs', jobRoutes);
+
+// ✅ Serve frontend static files (AFTER routes)
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// ✅ Catch-all route for SPA
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 const PORT = process.env.PORT || 5000;
 

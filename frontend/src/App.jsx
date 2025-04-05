@@ -7,6 +7,9 @@ import PostJob from './components/PostJob';
 import AppliedJobs from './components/AppliedJobs';
 import Contact from './components/Contact'; // ✅ import Contact
 import Footer from './components/Footer';
+import Profile from './components/Profile'; // ✅ Import
+import SkillsCarousel from './components/SkillsCarousel'; // ✅ Import SkillsCarousel
+
 
 function App() {
 
@@ -32,12 +35,14 @@ function App() {
           element={
             <>
               <Home />
+              <SkillsCarousel />
               <PostJob />
               <Contact /> 
               <Footer />
             </>
           }
         />
+        <Route path="/profile" element={<Profile />} />  // ✅ Add this line
         <Route path="/applied" element={<AppliedJobs />} />
         <Route path="/contact" element={<Contact />} />
       </Routes>

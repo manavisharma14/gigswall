@@ -3,7 +3,7 @@ import React from 'react';
 
 function Contact() {
   return (
-    <section className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white py-20 px-4 pt-36">
+    <section className="min-h-screen bg-white-50 dark:bg-gray-900 text-gray-800 dark:text-white py-20 px-4 pt-36">
       <div className="max-w-4xl mx-auto">
         <h2 className="text-3xl font-bold mb-8 text-center">📬 Contact Us</h2>
 

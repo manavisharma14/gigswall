@@ -1,3 +1,4 @@
+// backend/routes/jobs.js
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
@@ -15,14 +16,15 @@ router.get('/', async (req, res) => {
 });
 
 // ✅ POST a new job (auth required)
+// ✅ POST a new job (auth required)
 router.post('/', authMiddleware, async (req, res) => {
   console.log('📥 POST /api/jobs hit');
   console.log('➡️  Request body:', req.body);
   console.log('🧑 User ID:', req.userId);
 
-  const { title, desc, budget } = req.body;
+  const { title, desc, budget, skills, timeline } = req.body;
 
-  if (!title || !desc || !budget) {
+  if (!title || !desc || !budget || !skills || !timeline) {
     return res.status(400).json({ message: 'Please fill all fields' });
   }
 
@@ -31,6 +33,8 @@ router.post('/', authMiddleware, async (req, res) => {
       title,
       desc,
       budget,
+      skills,
+      timeline,
       createdBy: req.userId
     });
 
@@ -42,38 +46,63 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 
-
-// POST /api/jobs/:id/apply → logged-in user applies for a job
+// ✅ POST /api/jobs/:id/apply
 router.post('/:id/apply', authMiddleware, async (req, res) => {
+  const userId = req.userId;
+  const jobId = req.params.id;
+  const { message, portfolio, availability } = req.body;
+
+  if (!message || !portfolio || !availability) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
   try {
-    const job = await Job.findById(req.params.id);
+    const job = await Job.findById(jobId);
     if (!job) return res.status(404).json({ message: 'Job not found' });
 
-    // prevent duplicate applications
-    if (job.applicants && job.applicants.includes(req.userId)) {
-      return res.status(400).json({ message: 'You already applied to this job' });
+    // Prevent duplicate applications safely
+    if (job.applicants.some(app => app?.user?.toString?.() === userId)) {
+      return res.status(400).json({ message: 'You have already applied to this job' });
     }
 
-    job.applicants = job.applicants || [];
-    job.applicants.push(req.userId);
-    await job.save();
+    job.applicants.push({
+      user: userId,
+      message,
+      portfolio,
+      availability,
+    });
 
-    res.status(200).json({ message: 'Successfully applied to job' });
+    await job.save();
+    res.status(200).json({ message: 'Application submitted successfully' });
   } catch (err) {
     console.error('Apply error:', err);
-    res.status(500).json({ message: 'Server error while applying' });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-
-// GET /api/jobs/applied → get all jobs this user has applied for
+// ✅ GET /api/jobs/applied → get all jobs this user has applied for
 router.get('/applied', authMiddleware, async (req, res) => {
   try {
-    const jobs = await Job.find({ applicants: req.userId });
+    const jobs = await Job.find({ 'applicants.user': req.userId });
     res.status(200).json(jobs);
   } catch (err) {
     console.error('Fetch applied jobs error:', err);
     res.status(500).json({ message: 'Server error while fetching applied jobs' });
+  }
+});
+
+
+router.get('/posted/responses', authMiddleware, async (req, res) => {
+  try {
+    const jobs = await Job.find({ createdBy: req.userId }).populate({
+      path: 'applicants.user',
+      select: 'name email department gender'
+    });
+
+    res.json(jobs);
+  } catch (err) {
+    console.error('Error fetching posted job responses:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

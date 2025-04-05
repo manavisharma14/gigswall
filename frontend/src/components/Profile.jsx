@@ -82,15 +82,27 @@ function Profile() {
                 appliedJobs.map((job) => (
                   <div
                     key={job._id}
-                    className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-lg transition hover:scale-[1.01]"
+                    className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 transition hover:shadow-lg"
                   >
-                    <h3 className="text-lg font-bold">{job.title}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{job.desc}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">💰 Budget: ${job.budget}</p>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{job.title}</h3>
+                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                      <span className="text-sm text-gray-700 dark:text-gray-300">🛠️ Skills:</span>
+                      {job.skills?.split(',').map((skill, index) => (
+                        <span
+                          key={index}
+                          className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 text-xs font-medium px-3 py-1 rounded-full"
+                        >
+                          {skill.trim()}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      💰 <span className="font-medium">Budget:</span> ${job.budget}
+                    </p>
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500">You haven’t applied to any jobs yet.</p>
+                <p className="text-gray-500 text-sm">You haven’t applied to any jobs yet.</p>
               )}
             </div>
           </div>
@@ -104,7 +116,6 @@ function Profile() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-xl font-bold text-indigo-600 dark:text-indigo-400">📝 {job.title}</h3>
-                    <p className="text-sm mt-1 text-gray-600 dark:text-gray-300">{job.desc}</p>
                     <p className="text-sm mt-1 text-gray-500 dark:text-gray-400">💰 Budget: ${job.budget}</p>
                   </div>
                   <button

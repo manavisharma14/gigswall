@@ -9,6 +9,7 @@ import Contact from './components/Contact'; // ✅ import Contact
 import Footer from './components/Footer';
 import Profile from './components/Profile'; // ✅ Import
 import SkillsCarousel from './components/SkillsCarousel'; // ✅ Import SkillsCarousel
+import About from './components/About'; // ✅ Import About
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
               <Home />
               <SkillsCarousel />
               <PostJob />
+              <About />
               <Contact /> 
               <Footer />
             </>

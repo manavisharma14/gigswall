@@ -4,8 +4,8 @@ const JobSchema = new mongoose.Schema({
   title: String,
   desc: String,
   budget: Number,
-  skills: String,         // ✅ New
-  timeline: String,       // ✅ New
+  skills: String,
+  timeline: String,
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
@@ -14,7 +14,14 @@ const JobSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     message: String,
     portfolio: String,
-    availability: String
+    availability: String,
+
+    // 👇 Add this:
+    status: {
+      type: String,
+      enum: ['Pending', 'Accepted', 'Rejected'],
+      default: 'Pending'
+    }
   }]
 }, { timestamps: true });
 

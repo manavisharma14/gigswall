@@ -16,7 +16,6 @@ router.get('/', async (req, res) => {
 });
 
 // ✅ POST a new job (auth required)
-// ✅ POST a new job (auth required)
 router.post('/', authMiddleware, async (req, res) => {
   console.log('📥 POST /api/jobs hit');
   console.log('➡️  Request body:', req.body);
@@ -45,7 +44,6 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 });
 
-
 // ✅ POST /api/jobs/:id/apply
 router.post('/:id/apply', authMiddleware, async (req, res) => {
   const userId = req.userId;
@@ -60,19 +58,13 @@ router.post('/:id/apply', authMiddleware, async (req, res) => {
     const job = await Job.findById(jobId);
     if (!job) return res.status(404).json({ message: 'Job not found' });
 
-    // Prevent duplicate applications safely
     if (job.applicants.some(app => app?.user?.toString?.() === userId)) {
       return res.status(400).json({ message: 'You have already applied to this job' });
     }
 
-    job.applicants.push({
-      user: userId,
-      message,
-      portfolio,
-      availability,
-    });
-
+    job.applicants.push({ user: userId, message, portfolio, availability });
     await job.save();
+
     res.status(200).json({ message: 'Application submitted successfully' });
   } catch (err) {
     console.error('Apply error:', err);
@@ -91,7 +83,7 @@ router.get('/applied', authMiddleware, async (req, res) => {
   }
 });
 
-
+// ✅ GET posted jobs with responses
 router.get('/posted/responses', authMiddleware, async (req, res) => {
   try {
     const jobs = await Job.find({ createdBy: req.userId }).populate({
@@ -105,6 +97,42 @@ router.get('/posted/responses', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+// ✅ PATCH application status
+router.patch('/:jobId/applications/:userId/status', authMiddleware, async (req, res) => {
+  const { jobId, userId } = req.params;
+  const { status } = req.body;
+
+  if (!['Pending', 'Accepted', 'Rejected'].includes(status)) {
+    return res.status(400).json({ message: 'Invalid status value' });
+  }
+
+  try {
+    const job = await Job.findById(jobId);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+
+    console.log("job.createdBy:", job.createdBy);
+    console.log("req.userId (from token):", req.userId);
+
+    if (job.createdBy.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    const applicant = job.applicants.find(app => app.user.toString() === userId);
+    if (!applicant) {
+      return res.status(404).json({ message: 'Applicant not found' });
+    }
+
+    applicant.status = status;
+    await job.save();
+
+    res.status(200).json({ message: 'Status updated successfully', applicant });
+  } catch (err) {
+    console.error('Status update error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 
 module.exports = router;

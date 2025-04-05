@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Login from './Login';
 import Register from './Register';
@@ -6,6 +6,8 @@ import Register from './Register';
 function Navbar({ toggleTheme, darkMode }) {
   const [modalType, setModalType] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLogoutToast, setShowLogoutToast] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false); // State for login prompt
   const navigate = useNavigate();
 
   // Check login status on mount
@@ -15,6 +17,14 @@ function Navbar({ toggleTheme, darkMode }) {
   }, []);
 
   const handlePostJobClick = () => {
+    if (!isLoggedIn) {
+      // Show login prompt if not logged in
+      setShowLoginPrompt(true);
+      setTimeout(() => setShowLoginPrompt(false), 3000); // Hide after 3 seconds
+      return;
+    }
+
+    // If logged in, proceed to create a gig
     if (window.location.pathname !== '/') {
       navigate('/');
       setTimeout(() => {
@@ -30,7 +40,11 @@ function Navbar({ toggleTheme, darkMode }) {
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
-    navigate('/');
+    setShowLogoutToast(true);
+    setTimeout(() => {
+      setShowLogoutToast(false);
+      navigate('/');
+    }, 1500);
   };
 
   return (
@@ -46,9 +60,12 @@ function Navbar({ toggleTheme, darkMode }) {
         <div className="space-x-4 flex items-center">
           <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300">Home</Link>
           <button onClick={handlePostJobClick} className="hover:text-gray-600 dark:hover:text-gray-300">Post Job</button>
-          <Link to="/applied" className="hover:text-gray-600 dark:hover:text-gray-300">Applied Jobs</Link>
           <Link to="/contact" className="hover:text-gray-600 dark:hover:text-gray-300">Contact</Link>
-          <Link to="/profile" className="hover:text-gray-600 dark:hover:text-gray-300">My Profile</Link>
+
+          {/* Conditional "My Profile" Link */}
+          {isLoggedIn && (
+            <Link to="/profile" className="hover:text-gray-600 dark:hover:text-gray-300">My Profile</Link>
+          )}
 
           {/* Theme Toggle */}
           <button
@@ -80,28 +97,41 @@ function Navbar({ toggleTheme, darkMode }) {
         </div>
       </div>
 
+      {/* Toast on Logout */}
+      {showLogoutToast && (
+        <div className="absolute top-24 right-6 bg-red-100 border border-red-400 text-red-800 px-4 py-2 rounded-lg shadow-lg animate-slide-in-down z-50">
+          👋 You’ve been logged out.
+        </div>
+      )}
+
+      {/* Login Prompt Toast */}
+      {showLoginPrompt && (
+        <div className="absolute top-24 right-6 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-lg shadow-lg animate-slide-in-down z-50">
+          ⚠️ Please log in to create a gig.
+        </div>
+      )}
+
       {/* Modals */}
       {modalType === 'login' && (
-  <Login
-    closeModal={() => setModalType(null)}
-    switchToRegister={() => setModalType('register')}
-    onLoginSuccess={() => {
-      setModalType(null);
-      setIsLoggedIn(true);
-    }}
-  />
-)}
-{modalType === 'register' && (
-  <Register
-    closeModal={() => setModalType(null)}
-    switchToLogin={() => setModalType('login')}
-    onRegisterSuccess={() => {
-      setModalType(null);
-      setIsLoggedIn(true);
-    }}
-  />
-)}
-
+        <Login
+          closeModal={() => setModalType(null)}
+          switchToRegister={() => setModalType('register')}
+          onLoginSuccess={() => {
+            setModalType(null);
+            setIsLoggedIn(true);
+          }}
+        />
+      )}
+      {modalType === 'register' && (
+        <Register
+          closeModal={() => setModalType(null)}
+          switchToLogin={() => setModalType('login')}
+          onRegisterSuccess={() => {
+            setModalType(null);
+            setIsLoggedIn(true);
+          }}
+        />
+      )}
     </nav>
   );
 }

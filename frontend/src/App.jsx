@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import Profile from './components/Profile'; // ✅ Import
 import SkillsCarousel from './components/SkillsCarousel'; // ✅ Import SkillsCarousel
 import About from './components/About'; // ✅ Import About
+import PeerMeet from './components/PeerMeet'; // ✅ Import
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
           element={
             <>
               <Home />
+              <PeerMeet />
               <SkillsCarousel />
               <PostJob />
               <About />

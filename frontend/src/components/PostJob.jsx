@@ -161,80 +161,75 @@ function PostJob() {
         </div>
 
         {/* CREATE GIG MODAL */}
-        {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
-            <div className="bg-white dark:bg-gray-800 p-10 rounded-2xl w-full max-w-3xl relative shadow-2xl">
-              <button
-                onClick={() => setShowModal(false)}
-                className="absolute top-3 right-4 text-2xl text-gray-500"
-              >
-                &times;
-              </button>
-              <h3 className="text-2xl font-semibold text-yellow-600 dark:text-yellow-400 mb-6">
-                Post a New Gig
-              </h3>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {['title', 'skills', 'timeline', 'budget'].map((field, i) => (
-                  <input
-                    key={i}
-                    name={field}
-                    value={newJob[field]}
-                    onChange={handleChange}
-                    placeholder={
-                      field.charAt(0).toUpperCase() + field.slice(1)
-                    }
-                    className="w-full px-4 py-2 border rounded bg-white dark:bg-gray-700 text-black dark:text-white"
-                    type={field === 'budget' ? 'number' : 'text'}
-                    required
-                  />
-                ))}
+{showModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+    <div className="bg-white dark:bg-gray-800 p-10 rounded-2xl w-full max-w-3xl relative shadow-2xl">
+      <button
+        onClick={() => setShowModal(false)}
+        className="absolute top-3 right-4 text-2xl text-gray-500"
+      >
+        &times;
+      </button>
+      <h3 className="text-2xl font-semibold text-purple-700 dark:text-purple-400 mb-6">
+        Post a New Gig
+      </h3>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {['title', 'skills', 'timeline', 'budget'].map((field, i) => (
+          <input
+            key={i}
+            name={field}
+            value={newJob[field]}
+            onChange={handleChange}
+            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+            className="w-full px-4 py-2 border rounded bg-white dark:bg-gray-700 text-black dark:text-white"
+            type={field === 'budget' ? 'number' : 'text'}
+            required
+          />
+        ))}
 
-                {/* Description + AI generation */}
-                <div className="relative">
-                  <textarea
-                    name="desc"
-                    value={newJob.desc}
-                    onChange={handleChange}
-                    placeholder="Job Description"
-                    rows={8}
-                    className="w-full px-4 py-3 border rounded bg-white dark:bg-gray-700 text-black dark:text-white"
-                  />
-                  <div className="text-right mt-2">
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        if (
-                          !newJob.title ||
-                          !newJob.skills ||
-                          !newJob.timeline
-                        ) {
-                          alert('Enter Title, Skills & Timeline first.');
-                          return;
-                        }
-                        const desc = await generateJobDescription(
-                          newJob.title,
-                          newJob.skills,
-                          newJob.timeline
-                        );
-                        setNewJob((prev) => ({ ...prev, desc }));
-                      }}
-                      className="text-sm bg-indigo-600 text-white px-4 py-1 rounded hover:bg-indigo-700"
-                    >
-                      ✨ Generate with AI
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600"
-                >
-                  Post
-                </button>
-              </form>
-            </div>
+        {/* Description + AI generation */}
+        <div className="relative">
+          <textarea
+            name="desc"
+            value={newJob.desc}
+            onChange={handleChange}
+            placeholder="Job Description"
+            rows={8}
+            className="w-full px-4 py-3 border rounded bg-white dark:bg-gray-700 text-black dark:text-white"
+          />
+          <div className="text-right mt-2">
+            <button
+              type="button"
+              onClick={async () => {
+                if (!newJob.title || !newJob.skills || !newJob.timeline) {
+                  alert('Enter Title, Skills & Timeline first.');
+                  return;
+                }
+                const desc = await generateJobDescription(
+                  newJob.title,
+                  newJob.skills,
+                  newJob.timeline
+                );
+                setNewJob((prev) => ({ ...prev, desc }));
+              }}
+              className="text-sm bg-purple-600 text-white px-4 py-1 rounded hover:bg-purple-700"
+            >
+              ✨ Generate with AI
+            </button>
           </div>
-        )}
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700"
+        >
+          Post
+        </button>
+      </form>
+    </div>
+  </div>
+)}
+
 
         {/* DESCRIPTION MODAL */}
         {descModal && (

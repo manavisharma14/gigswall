@@ -37,6 +37,34 @@ function Profile() {
     );
   };
 
+  const handleStatusChange = async (jobId, userId, newStatus) => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`http://localhost:5001/api/jobs/${jobId}/applications/${userId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+  
+      const data = await res.json();
+      if (res.ok) {
+  
+        // 🔁 Refetch updated job responses!
+        const updatedJobsRes = await fetch('http://localhost:5001/api/jobs/posted/responses', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const updatedJobs = await updatedJobsRes.json();
+        setPostedJobs(updatedJobs);
+      }
+    } catch (err) {
+      console.error('Status update error:', err);
+    }
+  };
+  
+
   const getAvatarUrl = (gender = 'other', email = '') => {
     const maleImages = ['/avatars/male1.png', '/avatars/male2.png', '/avatars/male3.png'];
     const femaleImages = ['/avatars/female1.png', '/avatars/female2.png', '/avatars/female3.png'];
@@ -99,6 +127,11 @@ function Profile() {
                     <p className="text-sm text-gray-700 dark:text-gray-300">
                       💰 <span className="font-medium">Budget:</span> ${job.budget}
                     </p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                      📌 <strong>Status:</strong> {
+                        job.applicants?.find(app => app.user === user?._id)?.status || 'Pending'
+                      }
+                    </p>
                   </div>
                 ))
               ) : (
@@ -138,6 +171,20 @@ function Profile() {
                             <p><strong>Message:</strong> {app.message}</p>
                             <p><strong>Portfolio:</strong> <a href={app.portfolio} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{app.portfolio}</a></p>
                             <p><strong>Availability:</strong> {app.availability}</p>
+                            <p><strong>Status:</strong> {app.status || 'Pending'}</p>
+                            <div className="mt-2 flex gap-2">
+                              {['Accepted', 'Rejected', 'Pending'].map((s) => (
+                                <button
+                                  key={s}
+                                  onClick={() => handleStatusChange(job._id, app.user._id, s)}
+                                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                    app.status === s ? 'bg-indigo-600 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                  }`}
+                                >
+                                  {s}
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         ))}
                       </div>

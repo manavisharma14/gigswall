@@ -1,4 +1,3 @@
-// ✅ Register.jsx
 import React, { useState } from 'react';
 
 function Register({ closeModal, switchToLogin, onRegisterSuccess }) {
@@ -9,6 +8,8 @@ function Register({ closeModal, switchToLogin, onRegisterSuccess }) {
     department: '',
     gender: '',
   });
+
+  const [successMsg, setSuccessMsg] = useState('');
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -28,8 +29,10 @@ function Register({ closeModal, switchToLogin, onRegisterSuccess }) {
 
       if (res.ok) {
         localStorage.setItem('token', data.token);
-        alert('Registration successful!');
-        onRegisterSuccess(); // ✅ ONLY here
+        setSuccessMsg('✅ Registration complete!');
+        setTimeout(() => {
+          onRegisterSuccess();
+        }, 1500);
       } else {
         alert(data.message || 'Registration failed');
       }
@@ -47,8 +50,14 @@ function Register({ closeModal, switchToLogin, onRegisterSuccess }) {
       <form
         onSubmit={handleSubmit}
         onClick={(e) => e.stopPropagation()}
-        className="max-w-md w-full bg-white dark:bg-gray-800 p-6 rounded shadow text-gray-800 dark:text-white"
+        className="relative max-w-md w-full bg-white dark:bg-gray-800 p-6 rounded shadow text-gray-800 dark:text-white"
       >
+        {successMsg && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-100 border border-green-400 text-green-800 px-4 py-2 rounded-lg shadow-lg animate-bounce">
+            {successMsg}
+          </div>
+        )}
+
         <h2 className="text-xl font-bold mb-4 text-center text-green-600 dark:text-green-300">
           Register
         </h2>

@@ -4,7 +4,8 @@ import { io } from 'socket.io-client';
 const socket = io("https://peergigbe.onrender.com"); // backend URL
 
 function Chat({ jobId, userId }) {
-  const roomId = `${jobId}-${userId}`;
+const sortedIds = [senderId, receiverId].sort().join('');
+  const roomId = `${jobId}-${sortedIds}`;
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
 

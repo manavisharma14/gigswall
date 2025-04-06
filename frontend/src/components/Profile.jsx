@@ -3,10 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import Chat from './Chat';
 
-
 function Profile() {
-  //const url = "https://peergigbe.onrender.com";
-  const url = "http://localhost:5001"
+  const url = "https://peergigbe.onrender.com";
   const [user, setUser] = useState(null);
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [postedJobs, setPostedJobs] = useState([]);
@@ -66,7 +64,6 @@ function Profile() {
         const updatedJobs = await updatedJobsRes.json();
         setPostedJobs(updatedJobs);
 
-        // 🔔 Trigger socket message if accepted
         if (newStatus === 'Accepted') {
           socket.emit('gig-accepted', { jobId, userId });
         }
@@ -118,39 +115,40 @@ function Profile() {
             <h2 className="text-2xl font-bold mb-6">Applied gigs</h2>
             <div className="space-y-6">
               {appliedJobs.length > 0 ? (
-                appliedJobs.map((job) => (
-                  <div
-                    key={job._id}
-                    className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 transition hover:shadow-lg"
-                  >
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{job.title}</h3>
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <span className="text-sm text-gray-700 dark:text-gray-300">🛠️ Skills:</span>
-                      {job.skills?.split(',').map((skill, index) => (
-                        <span
-                          key={index}
-                          className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 text-xs font-medium px-3 py-1 rounded-full"
-                        >
-                          {skill.trim()}
-                        </span>
-                      ))}
+                appliedJobs.map((job) => {
+                  const applicant = job.applicants?.find(app => app.user === user?._id);
+                  const isAccepted = applicant?.status === 'Accepted';
+                  return (
+                    <div
+                      key={job._id}
+                      className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 transition hover:shadow-lg"
+                    >
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{job.title}</h3>
+                      <div className="flex flex-wrap items-center gap-2 mb-3">
+                        <span className="text-sm text-gray-700 dark:text-gray-300">🛠️ Skills:</span>
+                        {job.skills?.split(',').map((skill, index) => (
+                          <span
+                            key={index}
+                            className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 text-xs font-medium px-3 py-1 rounded-full"
+                          >
+                            {skill.trim()}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        💰 <span className="font-medium">Budget:</span> ${job.budget}
+                      </p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                        📌 <strong>Status:</strong> {applicant?.status || 'Pending'}
+                      </p>
+                      {isAccepted && (
+                        <div className="mt-4">
+                          <Chat jobId={job._id} senderId={user._id} receiverId={job.createdBy} />
+                        </div>
+                      )}
                     </div>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                      💰 <span className="font-medium">Budget:</span> ${job.budget}
-                    </p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
-                      📌 <strong>Status:</strong> {
-                        job.applicants?.find(app => app.user === user?._id)?.status || 'Pending'
-                      }
-                    </p>
-                    {job.applicants?.find(app => app.user === user?._id)?.status === 'Accepted' && (
-  <div className="mt-4">
-    <Chat jobId={job._id} userId={user._id} />
-  </div>
-)}
-
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <p className="text-gray-500 text-sm">You haven’t applied to any jobs yet.</p>
               )}
@@ -190,44 +188,30 @@ function Profile() {
                             <p><strong>Availability:</strong> {app.availability}</p>
                             <p><strong>Status:</strong> {app.status || 'Pending'}</p>
                             {app.status === 'Accepted' && user && (
-  <div className="mt-4">
-    <Chat jobId={job._id} userId={user._id} />
-  </div>
-)}
-
+                              <div className="mt-4">
+                                <Chat jobId={job._id} senderId={user._id} receiverId={app.user._id} />
+                              </div>
+                            )}
                             <div className="mt-2 flex gap-2">
-  <button
-    onClick={() => handleStatusChange(job._id, app.user._id, 'Accepted')}
-    className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${
-      app.status === 'Accepted'
-        ? 'bg-green-600 text-white'
-        : 'bg-green-100 text-green-700 hover:bg-green-200'
-    }`}
-  >
-    Accepted
-  </button>
-  <button
-    onClick={() => handleStatusChange(job._id, app.user._id, 'Rejected')}
-    className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${
-      app.status === 'Rejected'
-        ? 'bg-red-600 text-white'
-        : 'bg-red-100 text-red-700 hover:bg-red-200'
-    }`}
-  >
-    Rejected
-  </button>
-  <button
-    onClick={() => handleStatusChange(job._id, app.user._id, 'Pending')}
-    className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${
-      app.status === 'Pending'
-        ? 'bg-yellow-500 text-white'
-        : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-    }`}
-  >
-    Pending
-  </button>
-</div>
-
+                              <button
+                                onClick={() => handleStatusChange(job._id, app.user._id, 'Accepted')}
+                                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${app.status === 'Accepted' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}
+                              >
+                                Accepted
+                              </button>
+                              <button
+                                onClick={() => handleStatusChange(job._id, app.user._id, 'Rejected')}
+                                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${app.status === 'Rejected' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
+                              >
+                                Rejected
+                              </button>
+                              <button
+                                onClick={() => handleStatusChange(job._id, app.user._id, 'Pending')}
+                                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${app.status === 'Pending' ? 'bg-yellow-500 text-white' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'}`}
+                              >
+                                Pending
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>

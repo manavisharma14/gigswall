@@ -108,7 +108,7 @@ function Profile() {
           </div>
 
           <div className="md:w-1/2 w-full">
-            <h2 className="text-2xl font-bold mb-6">📋 Applied Jobs</h2>
+            <h2 className="text-2xl font-bold mb-6">Applied gigs</h2>
             <div className="space-y-6">
               {appliedJobs.length > 0 ? (
                 appliedJobs.map((job) => (
@@ -146,7 +146,7 @@ function Profile() {
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold mb-6">📢 Jobs You've Posted & Responses</h2>
+          <h2 className="text-2xl font-bold mb-6"> Gigs you've Posted & responses</h2>
           {postedJobs.length > 0 ? (
             postedJobs.map((job) => (
               <div key={job._id} className="bg-white dark:bg-gray-800 p-6 mb-8 rounded-xl shadow-lg border dark:border-gray-700">

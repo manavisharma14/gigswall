@@ -116,17 +116,18 @@ function PostJob() {
         <div className="flex items-center justify-between mb-8 px-2">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Latest Gigs</h2>
           <button
-            onClick={() => {
-              if (!localStorage.getItem('token')) {
-                setShowLoginAlert(true);
-              } else {
-                setShowModal(true);
-              }
-            }}
-            className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800"
-          >
-            <span className="text-white mr-2">➕</span> Create a Gig
-          </button>
+  onClick={() => {
+    if (!localStorage.getItem('token')) {
+      setShowLoginAlert(true);
+    } else {
+      setShowModal(true);
+    }
+  }}
+  className="px-6 py-3 bg-white text-gray-800 rounded-lg border border-gray-300 hover:bg-gray-100"
+>
+  <span className="text-purple-600 mr-2">➕</span> Create a Gig
+</button>
+
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
 function Profile() {
+
+  const url = "https://peergigbe.onrender.com"
+  //const url = "http://localhost:5001"
+  
   const [user, setUser] = useState(null);
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [postedJobs, setPostedJobs] = useState([]);
@@ -53,7 +57,7 @@ function Profile() {
       if (res.ok) {
   
         // 🔁 Refetch updated job responses!
-        const updatedJobsRes = await fetch('http://localhost:5001/api/jobs/posted/responses', {
+        const updatedJobsRes = await fetch(url + '/api/jobs/posted/responses', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const updatedJobs = await updatedJobsRes.json();

@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
 function AppliedJobs() {
+
+  const url = "https://peergigbe.onrender.com"
+  //const url = "http://localhost:5001"
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    fetch('http://localhost:5001/api/jobs/applied', {
+    fetch(url + '/api/jobs/applied', {
       headers: {
         Authorization: `Bearer ${token}`,
       }

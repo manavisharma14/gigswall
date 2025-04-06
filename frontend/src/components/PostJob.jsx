@@ -5,6 +5,11 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
 function PostJob() {
+
+  const url = "https://peergigbe.onrender.com"
+  //const url = "http://localhost:5001"
+
+
   const [jobs, setJobs] = useState([]);
   const [newJob, setNewJob] = useState({
     title: '',
@@ -24,7 +29,7 @@ function PostJob() {
 
   // Fetch jobs on mount
   useEffect(() => {
-    fetch('http://localhost:5001/api/jobs')
+    fetch(url + '/api/jobs')
       .then((res) => res.json())
       .then((data) => setJobs(data))
       .catch((err) => console.error('Error fetching jobs:', err));

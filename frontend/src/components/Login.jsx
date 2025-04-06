@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 
 function Login({ closeModal, switchToRegister, onLoginSuccess }) {
+
+  const url = "https://peergigbe.onrender.com"
+  //const url = "http://localhost:5001"
+
   const [form, setForm] = useState({ email: '', password: '' });
   const [successMsg, setSuccessMsg] = useState('');
 
@@ -12,7 +16,7 @@ function Login({ closeModal, switchToRegister, onLoginSuccess }) {
     e.preventDefault();
 
     try {
-      const res = await fetch('http://localhost:5001/api/auth/login', {
+      const res = await fetch(url + '/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

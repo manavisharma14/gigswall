@@ -1,7 +1,7 @@
 // Profile.jsx with all Chat and Socket.io references removed
 import React, { useEffect, useState } from 'react';
 import { io } from 'socket.io-client'; // Import Socket.io client
-const socket = io('http://localhost:5001'); // Connect to the backend server
+const socket = io('https://peergigbe.onrender.com'); // Connect to the backend server
 
 function Profile() {
   const url = "https://peergigbe.onrender.com";
@@ -127,7 +127,7 @@ function Profile() {
     setChatUser(user);
     
     // Fetch previous messages between the current user and the user who created the job
-    fetch(`http://localhost:5001/api/messages/${user}`, {
+    fetch(url + `api/messages/${user}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },

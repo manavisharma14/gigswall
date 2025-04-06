@@ -64,7 +64,7 @@ function Navbar({ toggleTheme, darkMode }) {
   useEffect(() => {
     // Fetch all users when the chat modal is opened
     if (isChatModalOpen) {
-      fetch('http://localhost:5001/api/auth/users') // Adjust your endpoint
+      fetch(url + '/api/auth/users') // Adjust your endpoint
         .then((response) => response.json())
         .then((data) => {
           setUsers(data.filter(user => user._id !== currentUser._id)); // Exclude current user
@@ -140,7 +140,7 @@ function Navbar({ toggleTheme, darkMode }) {
     setMessages([]); // Clear previous messages
 
     // Fetch previous messages between the users from the backend
-    fetch(`http://localhost:5001/api/messages/${user._id}`, {
+    fetch(url + `/api/messages/${user._id}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }

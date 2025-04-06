@@ -1,14 +1,17 @@
+// Profile.jsx with Socket.io chat trigger
 import React, { useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
+import Chat from './Chat';
+
 
 function Profile() {
-
-  const url = "https://peergigbe.onrender.com"
-  //const url = "http://localhost:5001"
-
+  //const url = "https://peergigbe.onrender.com";
+  const url = "http://localhost:5001"
   const [user, setUser] = useState(null);
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [postedJobs, setPostedJobs] = useState([]);
   const [expandedJobs, setExpandedJobs] = useState([]);
+  const socket = io(url); // Connect socket
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -33,6 +36,8 @@ function Profile() {
       .then((res) => res.json())
       .then((data) => setPostedJobs(data))
       .catch((err) => console.error('Error fetching posted job responses:', err));
+
+    return () => socket.disconnect();
   }, []);
 
   const toggleExpand = (id) => {
@@ -52,22 +57,24 @@ function Profile() {
         },
         body: JSON.stringify({ status: newStatus }),
       });
-  
+
       const data = await res.json();
       if (res.ok) {
-  
-        // 🔁 Refetch updated job responses!
         const updatedJobsRes = await fetch(url + '/api/jobs/posted/responses', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const updatedJobs = await updatedJobsRes.json();
         setPostedJobs(updatedJobs);
+
+        // 🔔 Trigger socket message if accepted
+        if (newStatus === 'Accepted') {
+          socket.emit('gig-accepted', { jobId, userId });
+        }
       }
     } catch (err) {
       console.error('Status update error:', err);
     }
   };
-  
 
   const getAvatarUrl = (gender = 'other', email = '') => {
     const maleImages = ['/avatars/male1.png', '/avatars/male2.png', '/avatars/male3.png'];
@@ -176,6 +183,12 @@ function Profile() {
                             <p><strong>Portfolio:</strong> <a href={app.portfolio} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{app.portfolio}</a></p>
                             <p><strong>Availability:</strong> {app.availability}</p>
                             <p><strong>Status:</strong> {app.status || 'Pending'}</p>
+                            {app.status === 'Accepted' && user && (
+  <div className="mt-4">
+    <Chat jobId={job._id} userId={user._id} />
+  </div>
+)}
+
                             <div className="mt-2 flex gap-2">
   <button
     onClick={() => handleStatusChange(job._id, app.user._id, 'Accepted')}

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 
 function Login({ closeModal, switchToRegister, onLoginSuccess }) {
 
-  const url = "https://peergigbe.onrender.com"
-  //const url = "http://localhost:5001"
+  //const url = "https://peergigbe.onrender.com"
+  const url = "http://localhost:5001"
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [successMsg, setSuccessMsg] = useState('');

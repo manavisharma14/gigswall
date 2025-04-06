@@ -127,7 +127,7 @@ function Profile() {
     setChatUser(user);
     
     // Fetch previous messages between the current user and the user who created the job
-    fetch(url + `api/messages/${user}`, {
+    fetch(url + `/api/messages/${user}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
@@ -357,7 +357,7 @@ function Profile() {
                     <div
                       className={`max-w-xs px-4 py-2 rounded-lg ${msg.from === user._id ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'}`}
                     >
-                      <strong>{msg.from === user._id ? 'You' : chatWithUser.name}:</strong>
+                      {/* <strong>{msg.from === user._id ? 'You' : chatWithUser.name}:</strong> */}
                       <div>{msg.content}</div>
                       <small className="block text-xs text-gray-500">{new Date(msg.timestamp).toLocaleString()}</small>
                     </div>

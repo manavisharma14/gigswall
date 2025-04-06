@@ -1,6 +1,5 @@
-// Profile.jsx with Socket.io chat trigger
+// Profile.jsx
 import React, { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
 import Chat from './Chat';
 
 function Profile() {
@@ -9,7 +8,6 @@ function Profile() {
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [postedJobs, setPostedJobs] = useState([]);
   const [expandedJobs, setExpandedJobs] = useState([]);
-  const socket = io(url); // Connect socket
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -34,8 +32,6 @@ function Profile() {
       .then((res) => res.json())
       .then((data) => setPostedJobs(data))
       .catch((err) => console.error('Error fetching posted job responses:', err));
-
-    return () => socket.disconnect();
   }, []);
 
   const toggleExpand = (id) => {
@@ -63,10 +59,6 @@ function Profile() {
         });
         const updatedJobs = await updatedJobsRes.json();
         setPostedJobs(updatedJobs);
-
-        if (newStatus === 'Accepted') {
-          socket.emit('gig-accepted', { jobId, userId });
-        }
       }
     } catch (err) {
       console.error('Status update error:', err);
@@ -143,7 +135,7 @@ function Profile() {
                       </p>
                       {isAccepted && (
                         <div className="mt-4">
-                          <Chat jobId={job._id} senderId={user._id} receiverId={job.createdBy} />
+                          <Chat jobId={job._id} userId={user._id} />
                         </div>
                       )}
                     </div>
@@ -189,7 +181,7 @@ function Profile() {
                             <p><strong>Status:</strong> {app.status || 'Pending'}</p>
                             {app.status === 'Accepted' && user && (
                               <div className="mt-4">
-                                <Chat jobId={job._id} senderId={user._id} receiverId={app.user._id} />
+                                <Chat jobId={job._id} userId={user._id === app.user?._id ? job.createdBy : app.user._id} />
                               </div>
                             )}
                             <div className="mt-2 flex gap-2">

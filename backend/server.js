@@ -37,7 +37,8 @@ io.on('connection', (socket) => {
 
   socket.on('message', ({ roomId, text, sender }) => {
     console.log(`💬 Message in ${roomId} from ${sender}: ${text}`);
-    socket.to(roomId).emit('message', { text, sender });
+    io.to(roomId).emit('message', { text, sender }); // ✅ new line
+
   });
 
   socket.on('leave-room', ({ roomId }) => {

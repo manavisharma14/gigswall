@@ -1,4 +1,4 @@
-// Profile.jsx
+// Profile.jsx with all Chat and Socket.io references removed
 import React, { useEffect, useState } from 'react';
 
 function Profile() {
@@ -108,7 +108,6 @@ function Profile() {
               {appliedJobs.length > 0 ? (
                 appliedJobs.map((job) => {
                   const applicant = job.applicants?.find(app => app.user === user?._id);
-                  const isAccepted = applicant?.status === 'Accepted';
                   return (
                     <div
                       key={job._id}
@@ -132,11 +131,6 @@ function Profile() {
                       <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
                         📌 <strong>Status:</strong> {applicant?.status || 'Pending'}
                       </p>
-                      {isAccepted && (
-                        <div className="mt-4">
-                          <Chat jobId={job._id} userId={user._id} />
-                        </div>
-                      )}
                     </div>
                   );
                 })
@@ -178,11 +172,6 @@ function Profile() {
                             <p><strong>Portfolio:</strong> <a href={app.portfolio} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{app.portfolio}</a></p>
                             <p><strong>Availability:</strong> {app.availability}</p>
                             <p><strong>Status:</strong> {app.status || 'Pending'}</p>
-                            {app.status === 'Accepted' && user && (
-                              <div className="mt-4">
-                                <Chat jobId={job._id} userId={user._id === app.user?._id ? job.createdBy : app.user._id} />
-                              </div>
-                            )}
                             <div className="mt-2 flex gap-2">
                               <button
                                 onClick={() => handleStatusChange(job._id, app.user._id, 'Accepted')}

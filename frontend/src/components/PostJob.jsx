@@ -6,6 +6,8 @@ import DOMPurify from 'dompurify';
 
 function PostJob() {
   const url = "https://peergigbe.onrender.com";
+  //const url = "http://localhost:5001"
+
   const [jobs, setJobs] = useState([]);
   const [newJob, setNewJob] = useState({
     title: '',
@@ -16,6 +18,8 @@ function PostJob() {
   });
   const [showModal, setShowModal] = useState(false);
   const [showLoginAlert, setShowLoginAlert] = useState(false);
+  const [showAppliedAlert, setShowAppliedAlert] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [descModal, setDescModal] = useState(null);
   const [applyModal, setApplyModal] = useState(null);
   const [application, setApplication] = useState({
@@ -24,7 +28,6 @@ function PostJob() {
     availability: '',
   });
 
-  // Fetch jobs on mount
   useEffect(() => {
     fetch(url + '/api/jobs')
       .then((res) => res.json())
@@ -75,7 +78,37 @@ function PostJob() {
     }
   };
 
-  const handleLoginAlertClose = () => setShowLoginAlert(false);
+  const handleApplicationSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(
+        url + `/api/jobs/${applyModal._id}/apply`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(application),
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setApplyModal(null);
+        setShowSuccessModal(true);
+        setApplication({ message: '', portfolio: '', availability: '' });
+      } else if (data.message === 'You have already applied to this job') {
+        setApplyModal(null);
+        setShowAppliedAlert(true);
+      } else {
+        alert(data.message || '❌ Failed to apply');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Server error');
+    }
+  };
 
   return (
     <section id="postjobs" className="bg-white dark:bg-gray-900 py-20 px-4 pt-36 transition-colors duration-300">
@@ -83,19 +116,17 @@ function PostJob() {
         <div className="flex items-center justify-between mb-8 px-2">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Latest Gigs</h2>
           <button
-  onClick={() => {
-    if (!localStorage.getItem('token')) {
-      setShowLoginAlert(true);
-    } else {
-      setShowModal(true);
-    }
-  }}
-  className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 flex items-center gap-1 justify-center"
->
-  <span className="text-white text-xl">+</span>
-  <span className="text-white">Create a Gig</span>
-</button>
-
+            onClick={() => {
+              if (!localStorage.getItem('token')) {
+                setShowLoginAlert(true);
+              } else {
+                setShowModal(true);
+              }
+            }}
+            className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800"
+          >
+            <span className="text-white mr-2">➕</span> Create a Gig
+          </button>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -124,9 +155,25 @@ function PostJob() {
         </div>
 
         {showLoginAlert && (
-          <div onClick={handleLoginAlertClose} className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+          <div onClick={() => setShowLoginAlert(false)} className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
             <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-gray-800 text-center px-6 py-4 rounded-xl shadow-xl border border-red-300 text-red-600 font-medium text-lg">
               Oops! You have to login first.
+            </div>
+          </div>
+        )}
+
+        {showAppliedAlert && (
+          <div onClick={() => setShowAppliedAlert(false)} className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+            <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-gray-800 text-center px-6 py-4 rounded-xl shadow-xl border border-purple-300 text-purple-700 dark:text-purple-300 font-medium text-lg">
+              You've already applied to this job!
+            </div>
+          </div>
+        )}
+
+        {showSuccessModal && (
+          <div onClick={() => setShowSuccessModal(false)} className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+            <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-gray-800 text-center px-6 py-4 rounded-xl shadow-xl border border-green-300 text-green-700 dark:text-green-300 font-medium text-lg">
+              You have successfully applied to this job!
             </div>
           </div>
         )}

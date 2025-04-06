@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Login from './Login';
 import Register from './Register';
 
-const socket = io('http://localhost:5001'); // Connect to the backend server
+const socket = io('https://peergigbe.onrender.com'); // Connect to the backend server
 
 function Navbar({ toggleTheme, darkMode }) {
   const url = "https://peergigbe.onrender.com"

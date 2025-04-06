@@ -177,18 +177,38 @@ function Profile() {
                             <p><strong>Availability:</strong> {app.availability}</p>
                             <p><strong>Status:</strong> {app.status || 'Pending'}</p>
                             <div className="mt-2 flex gap-2">
-                              {['Accepted', 'Rejected', 'Pending'].map((s) => (
-                                <button
-                                  key={s}
-                                  onClick={() => handleStatusChange(job._id, app.user._id, s)}
-                                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                    app.status === s ? 'bg-indigo-600 text-white' : 'bg-gray-200 hover:bg-gray-300'
-                                  }`}
-                                >
-                                  {s}
-                                </button>
-                              ))}
-                            </div>
+  <button
+    onClick={() => handleStatusChange(job._id, app.user._id, 'Accepted')}
+    className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${
+      app.status === 'Accepted'
+        ? 'bg-green-600 text-white'
+        : 'bg-green-100 text-green-700 hover:bg-green-200'
+    }`}
+  >
+    Accepted
+  </button>
+  <button
+    onClick={() => handleStatusChange(job._id, app.user._id, 'Rejected')}
+    className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${
+      app.status === 'Rejected'
+        ? 'bg-red-600 text-white'
+        : 'bg-red-100 text-red-700 hover:bg-red-200'
+    }`}
+  >
+    Rejected
+  </button>
+  <button
+    onClick={() => handleStatusChange(job._id, app.user._id, 'Pending')}
+    className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${
+      app.status === 'Pending'
+        ? 'bg-yellow-500 text-white'
+        : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+    }`}
+  >
+    Pending
+  </button>
+</div>
+
                           </div>
                         ))}
                       </div>

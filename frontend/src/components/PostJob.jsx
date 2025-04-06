@@ -5,11 +5,7 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
 function PostJob() {
-
-  const url = "https://peergigbe.onrender.com"
-  //const url = "http://localhost:5001"
-
-
+  const url = "https://peergigbe.onrender.com";
   const [jobs, setJobs] = useState([]);
   const [newJob, setNewJob] = useState({
     title: '',
@@ -19,6 +15,7 @@ function PostJob() {
     timeline: '',
   });
   const [showModal, setShowModal] = useState(false);
+  const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [descModal, setDescModal] = useState(null);
   const [applyModal, setApplyModal] = useState(null);
   const [application, setApplication] = useState({
@@ -35,18 +32,19 @@ function PostJob() {
       .catch((err) => console.error('Error fetching jobs:', err));
   }, []);
 
-  // Handle new job input changes
   const handleChange = (e) => {
     setNewJob({ ...newJob, [e.target.name]: e.target.value });
   };
 
-  // Submit new job
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-
+    if (!token) {
+      setShowLoginAlert(true);
+      return;
+    }
     try {
-      const res = await fetch('http://localhost:5001/api/jobs', {
+      const res = await fetch(url + '/api/jobs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,12 +52,9 @@ function PostJob() {
         },
         body: JSON.stringify(newJob),
       });
-
       const data = await res.json();
       if (res.ok) {
-        // Successfully posted job
         setJobs([data, ...jobs]);
-        // Clear fields
         setNewJob({ title: '', desc: '', budget: '', skills: '', timeline: '' });
         setShowModal(false);
       } else {
@@ -71,99 +66,70 @@ function PostJob() {
     }
   };
 
+  const handleApplyClick = (job) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setShowLoginAlert(true);
+    } else {
+      setApplyModal(job);
+    }
+  };
+
+  const handleLoginAlertClose = () => setShowLoginAlert(false);
+
   return (
-    <section
-      id="postjobs"
-      className="bg-white dark:bg-gray-900 py-20 px-4 pt-36 transition-colors duration-300"
-    >
+    <section id="postjobs" className="bg-white dark:bg-gray-900 py-20 px-4 pt-36 transition-colors duration-300">
       <div className="max-w-6xl mx-auto text-center">
-        {/* Header section */}
         <div className="flex items-center justify-between mb-8 px-2">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-            Latest Gigs
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Latest Gigs</h2>
           <button
-            onClick={() => setShowModal(true)}
-            className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800"
-          >
-            ➕ Create a Gig
-          </button>
+  onClick={() => {
+    if (!localStorage.getItem('token')) {
+      setShowLoginAlert(true);
+    } else {
+      setShowModal(true);
+    }
+  }}
+  className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 flex items-center gap-1 justify-center"
+>
+  <span className="text-white text-xl">+</span>
+  <span className="text-white">Create a Gig</span>
+</button>
+
         </div>
 
-        {/* Gig Cards Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {jobs.map((job, idx) => (
-            <div
-              key={idx}
-              className="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md hover:shadow-lg transition flex flex-col justify-between min-h-[270px]"
-            >
-              {/* Title */}
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-white text-center mb-3">
-                {job.title}
-              </h4>
-
-              {/* Skill Tags */}
+            <div key={idx} className="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md hover:shadow-lg transition flex flex-col justify-between min-h-[270px]">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white text-center mb-3">{job.title}</h4>
               <div className="flex flex-wrap gap-2 justify-center mb-4">
-                {job.skills
-                  ?.split(',')
-                  .map((skill, i) => (
-                    <span
-                      key={i}
-                      className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-100
-                                 text-xs px-3 py-1 rounded-full shadow-sm whitespace-nowrap"
-                    >
-                      {skill.trim()}
-                    </span>
-                  ))}
+                {job.skills?.split(',').map((skill, i) => (
+                  <span key={i} className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-100 text-xs px-3 py-1 rounded-full shadow-sm whitespace-nowrap">
+                    {skill.trim()}
+                  </span>
+                ))}
               </div>
-
-              {/* Timeline & Budget */}
               <div className="flex items-center justify-center gap-6 text-sm text-gray-600 dark:text-gray-300 mb-4">
-                <div className="flex items-center gap-1">
-                  🕒 {job.timeline || 'N/A'}
-                </div>
-                <div className="flex items-center gap-1">
-                  💰{' '}
-                  <strong className="text-gray-800 dark:text-white">
-                    ${job.budget}
-                  </strong>
-                </div>
+                <div className="flex items-center gap-1">🕒 {job.timeline || 'N/A'}</div>
+                <div className="flex items-center gap-1">💰 <strong className="text-gray-800 dark:text-white">${job.budget}</strong></div>
               </div>
-
-              {/* Action Buttons */}
               <div className="mt-auto flex justify-between items-center">
-                <button
-                  onClick={() => setApplyModal(job)}
-                  className="bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-800 text-sm"
-                >
-                  I'm Interested
-                </button>
-
-                {/* 
-                  Purple-themed 'Know More' button in light mode,
-                  subtle in dark mode 
-                */}
-                <button
-                  onClick={() => setDescModal(job)}
-                  className="
-                    text-sm font-semibold
-                    border border-purple-500
-                    text-purple-600
-                    px-3 py-1 rounded-lg
-                    hover:bg-purple-500 hover:text-white
-                    transition
-                    dark:border-purple-400
-                    dark:text-purple-400
-                    dark:hover:bg-purple-500
-                    dark:hover:text-white
-                  "
-                >
+                <button onClick={() => handleApplyClick(job)} className="bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-800 text-sm">I'm Interested</button>
+                <button onClick={() => setDescModal(job)} className="text-sm font-semibold border border-purple-500 text-purple-600 px-3 py-1 rounded-lg hover:bg-purple-500 hover:text-white transition dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-500 dark:hover:text-white">
                   Know More
                 </button>
               </div>
             </div>
           ))}
         </div>
+
+        {showLoginAlert && (
+          <div onClick={handleLoginAlertClose} className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+            <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-gray-800 text-center px-6 py-4 rounded-xl shadow-xl border border-red-300 text-red-600 font-medium text-lg">
+              Oops! You have to login first.
+            </div>
+          </div>
+        )}
 
         {/* CREATE GIG MODAL */}
 {showModal && (
@@ -272,7 +238,7 @@ function PostJob() {
               </button>
               <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
                 Apply for:{' '}
-                <span className="text-yellow-600 dark:text-yellow-400">
+                <span className="text-purple-600 dark:text-yellow-400">
                   {applyModal.title}
                 </span>
               </h3>
@@ -282,7 +248,7 @@ function PostJob() {
                   const token = localStorage.getItem('token');
                   try {
                     const res = await fetch(
-                      `http://localhost:5001/api/jobs/${applyModal._id}/apply`,
+                      url + `/api/jobs/${applyModal._id}/apply`,
                       {
                         method: 'POST',
                         headers: {

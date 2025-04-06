@@ -18,7 +18,7 @@ function Home() {
 
       {/* Subheading */}
       <p className="mt-4 max-w-xl text-gray-700 dark:text-gray-300">
-        A freelance network where students hire students. No middlemen. No BS.
+      Campus chaos? Hire a peer!
       </p>
     </section>
   );

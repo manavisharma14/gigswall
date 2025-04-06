@@ -4,7 +4,7 @@ function Profile() {
 
   const url = "https://peergigbe.onrender.com"
   //const url = "http://localhost:5001"
-  
+
   const [user, setUser] = useState(null);
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [postedJobs, setPostedJobs] = useState([]);
@@ -13,21 +13,21 @@ function Profile() {
   useEffect(() => {
     const token = localStorage.getItem('token');
 
-    fetch('http://localhost:5001/api/auth/profile', {
+    fetch(url + '/api/auth/profile', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setUser(data))
       .catch((err) => console.error('Error fetching profile:', err));
 
-    fetch('http://localhost:5001/api/jobs/applied', {
+    fetch(url + '/api/jobs/applied', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setAppliedJobs(data))
       .catch((err) => console.error('Error fetching applied jobs:', err));
 
-    fetch('http://localhost:5001/api/jobs/posted/responses', {
+    fetch(url + '/api/jobs/posted/responses', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -44,7 +44,7 @@ function Profile() {
   const handleStatusChange = async (jobId, userId, newStatus) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://localhost:5001/api/jobs/${jobId}/applications/${userId}/status`, {
+      const res = await fetch(url + `/api/jobs/${jobId}/applications/${userId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

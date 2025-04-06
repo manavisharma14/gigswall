@@ -1,6 +1,5 @@
 // Profile.jsx
 import React, { useEffect, useState } from 'react';
-import Chat from './Chat';
 
 function Profile() {
   const url = "https://peergigbe.onrender.com";

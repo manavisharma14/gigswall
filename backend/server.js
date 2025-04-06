@@ -21,7 +21,7 @@ const server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
-    origin: 'http://localhost:5173',  // Update with your frontend URL (React frontend port)
+    origin: 'https://peergigfe-59yi.onrender.com',  // Update with your frontend URL (React frontend port)
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
     credentials: true,

@@ -31,17 +31,19 @@ function Navbar({ toggleTheme, darkMode }) {
       .catch((err) => console.error('Error fetching jobs:', err));
   }, []);
 
-  // Effect to check login status and user data when component mounts
   useEffect(() => {
     const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
-
-    // Check if the user exists in localStorage and update state once
     const user = localStorage.getItem('user');
-    if (user && !currentUser) {
-      setCurrentUser(JSON.parse(user));
+  
+    if (token && user) {
+      setIsLoggedIn(true);
+      if (!currentUser) setCurrentUser(JSON.parse(user));
+    } else {
+      setIsLoggedIn(false);
+      setCurrentUser(null);
     }
-  }, [currentUser]); // Only trigger when currentUser is not set
+  }, []);
+  
 
   // Effect to handle socket connection and registration
   useEffect(() => {
@@ -198,15 +200,7 @@ function Navbar({ toggleTheme, darkMode }) {
           )}
 
           {/* Chat Button */}
-          {isLoggedIn && currentUser && (
-            <button
-              onClick={toggleChatModal}
-              className="bg-green-500 hover:bg-green-600 text-white text-sm font-medium px-4 py-1.5 rounded-full flex items-center space-x-2 shadow-md transition"
-            >
-              <span>💬</span>
-              <span>Chat</span>
-            </button>
-          )}
+          
         </div>
       </div>
 

@@ -5,8 +5,8 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
 function PostJob() {
-  //const url = "https://peergigbe.onrender.com";
-  const url = "http://localhost:5001"
+  const url = "https://peergigbe.onrender.com";
+  // const url = "http://localhost:5001"
 
   const [jobs, setJobs] = useState([]);
   const [newJob, setNewJob] = useState({

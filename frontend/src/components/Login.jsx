@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { auth, provider } from '../firebase';
+import { signInWithPopup } from 'firebase/auth';
 
 function Login({ closeModal, switchToRegister, onLoginSuccess }) {
 
-  //const url = "https://peergigbe.onrender.com"
-  const url = "http://localhost:5001"
+  const url = "https://peergigbe.onrender.com"
+  // const url = "http://localhost:5001"
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [successMsg, setSuccessMsg] = useState('');
@@ -11,6 +13,8 @@ function Login({ closeModal, switchToRegister, onLoginSuccess }) {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  // const url = "http://localhost:5001"; // 🔁 Update this to your production URL later
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,20 +26,57 @@ function Login({ closeModal, switchToRegister, onLoginSuccess }) {
         body: JSON.stringify(form),
       });
 
-      const data = await res.json();
-
+      const data = await res.json();      
       if (res.ok) {
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user)); // ✅ Save full user object
         setSuccessMsg('🎉 Yay! You are now logged in.');
         setTimeout(() => {
           onLoginSuccess(); // Close modal and redirect
         }, 1500);
+        // window.location.reload(); // Optional
+
       } else {
         alert(data.message || 'Login failed');
       }
     } catch (err) {
       console.error(err);
       alert('Server error');
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const idToken = await result.user.getIdToken();
+      const { displayName, photoURL, email } = result.user;
+      console.log("hello from google", result.user.displayName)
+      localStorage.setItem('user', JSON.stringify({ displayName, photoURL, email }));
+      localStorage.setItem('token', idToken);
+
+      const res = await fetch(url + '/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken, displayName, email }),
+      });
+
+      const data = await res.json();
+      console.log("USER DATA", data);
+
+      if (res.ok) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user)); // ✅ Save full user from backend
+        setSuccessMsg('🎉 Yay! You are now logged in.');
+        setTimeout(() => {
+          onLoginSuccess(); // Close modal and redirect
+        }, 1500);
+        // window.location.reload(); // Optional
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (err) {
+      console.error('Google login error:', err);
+      alert('Google login failed');
     }
   };
 
@@ -54,7 +95,6 @@ function Login({ closeModal, switchToRegister, onLoginSuccess }) {
             {successMsg}
           </div>
         )}
-
         <h2 className="text-xl font-bold mb-4 text-center text-indigo-600 dark:text-indigo-300">
           Login
         </h2>
@@ -84,6 +124,14 @@ function Login({ closeModal, switchToRegister, onLoginSuccess }) {
           className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
         >
           Login
+        </button>
+
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-full mt-3 bg-red-500 text-white py-2 rounded hover:bg-red-600"
+        >
+          🔐 Sign in with Google
         </button>
 
         <p className="mt-4 text-sm text-center text-gray-600 dark:text-gray-400">

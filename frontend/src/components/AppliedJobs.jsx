@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 function AppliedJobs() {
 
   const url = "https://peergigbe.onrender.com"
-  //const url = "http://localhost:5001"
+  // const url = "http://localhost:5001"
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {

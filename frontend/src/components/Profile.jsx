@@ -1,12 +1,23 @@
 // Profile.jsx with all Chat and Socket.io references removed
 import React, { useEffect, useState } from 'react';
+import { io } from 'socket.io-client'; // Import Socket.io client
+const socket = io('http://localhost:5001'); // Connect to the backend server
 
 function Profile() {
   const url = "https://peergigbe.onrender.com";
+  // const url = "http://localhost:5001"  
+  
   const [user, setUser] = useState(null);
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [postedJobs, setPostedJobs] = useState([]);
   const [expandedJobs, setExpandedJobs] = useState([]);
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+  const [chatUser, setChatUser] = useState(null);
+  const [users, setUsers] = useState(null);
+
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState('');
+  const [chatWithUser, setChatWithUser] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -31,8 +42,34 @@ function Profile() {
       .then((res) => res.json())
       .then((data) => setPostedJobs(data))
       .catch((err) => console.error('Error fetching posted job responses:', err));
-  }, []);
 
+    if (isChatModalOpen) {
+
+      // fetch(url + '/api/auth/profile', {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // })
+      //   .then((res) => res.json())
+      //   .then((data) => {
+      //     setUsers([data]); // Exclude current user
+      //   })        
+      //   .catch((err) => console.error('Error fetching profile:', err));
+
+
+      fetch(url + '/api/auth/users') // Adjust your endpoint
+        .then((response) => response.json())
+        .then((data) => {
+          setUsers(data.filter(user => user._id === chatUser)); // Exclude current user
+        })
+        .catch((error) => console.error('Error fetching users:', error));
+
+      // console.log(users, chatUser);
+    }
+  }, [isChatModalOpen]);
+  useEffect(()=>{
+    console.log("lekfhkwehf", users, chatUser)
+    setChatUser(users?.[0]?.name)
+  }, [users, chatUser])
+  
   const toggleExpand = (id) => {
     setExpandedJobs((prev) =>
       prev.includes(id) ? prev.filter((jobId) => jobId !== id) : [...prev, id]
@@ -63,6 +100,45 @@ function Profile() {
       console.error('Status update error:', err);
     }
   };
+
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      const newMessage = {
+        from: user._id, // Send the user's ID
+        to: chatWithUser, // Send the recipient's ID
+        content: message,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Emit message to server
+      socket.emit('sendMessage', newMessage); 
+      setMessage(''); // Clear message input
+
+      // Update local messages list (this is for showing the sent message in real-time)
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    }
+  };
+
+  const handleChatClick = (user) => {
+    console.log(`Starting chat with user ID: ${user}`); // Ensure user._id is passed correctly
+    setIsChatModalOpen(!isChatModalOpen);
+    setMessages([]); // Clear messages when closing modal
+    setChatWithUser(user); // Set the user to chat with
+    setChatUser(user);
+    
+    // Fetch previous messages between the current user and the user who created the job
+    fetch(`http://localhost:5001/api/messages/${user}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setMessages(data);
+      })
+      .catch((error) => console.error('Error fetching messages:', error));
+  };
+  
 
   const getAvatarUrl = (gender = 'other', email = '') => {
     const maleImages = ['/avatars/male1.png', '/avatars/male2.png', '/avatars/male3.png'];
@@ -131,6 +207,15 @@ function Profile() {
                       <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
                         📌 <strong>Status:</strong> {applicant?.status || 'Pending'}
                       </p>
+                      {/* Check if the applicant's status is "Accepted" and show the chat button */}
+                    {job.applicants?.some(app => app.user === user?._id && app.status === 'Accepted') && (
+                      <button
+                        onClick={() => handleChatClick(job.createdBy)}  
+                        className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                      >
+                        💬 Start Chat
+                      </button>
+                    )}
                     </div>
                   );
                 })
@@ -159,54 +244,148 @@ function Profile() {
                   </button>
                 </div>
 
-                {expandedJobs.includes(job._id) && (
-                  <div className="mt-6">
-                    {job.applicants.length > 0 ? (
-                      <div className="grid gap-4">
-                        {job.applicants.map((app, idx) => (
-                          <div key={idx} className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                            <p><strong>Name:</strong> {app.user?.name}</p>
-                            <p><strong>Email:</strong> {app.user?.email}</p>
-                            <p><strong>Department:</strong> {app.user?.department}</p>
-                            <p><strong>Message:</strong> {app.message}</p>
-                            <p><strong>Portfolio:</strong> <a href={app.portfolio} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{app.portfolio}</a></p>
-                            <p><strong>Availability:</strong> {app.availability}</p>
-                            <p><strong>Status:</strong> {app.status || 'Pending'}</p>
-                            <div className="mt-2 flex gap-2">
-                              <button
-                                onClick={() => handleStatusChange(job._id, app.user._id, 'Accepted')}
-                                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${app.status === 'Accepted' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}
-                              >
-                                Accepted
-                              </button>
-                              <button
-                                onClick={() => handleStatusChange(job._id, app.user._id, 'Rejected')}
-                                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${app.status === 'Rejected' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
-                              >
-                                Rejected
-                              </button>
-                              <button
-                                onClick={() => handleStatusChange(job._id, app.user._id, 'Pending')}
-                                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${app.status === 'Pending' ? 'bg-yellow-500 text-white' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'}`}
-                              >
-                                Pending
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-400 italic">No applicants yet.</p>
-                    )}
-                  </div>
-                )}
+  {expandedJobs.includes(job._id) && (
+    <div className="mt-6">
+      {job.applicants.length > 0 ? (
+        <div className="grid gap-4">
+          {job.applicants.map((app, idx) => (
+            <div key={idx} className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <p><strong>Name:</strong> {app.user?.name}</p>
+              <p><strong>Email:</strong> {app.user?.email}</p>
+              <p><strong>Department:</strong> {app.user?.department}</p>
+              <p><strong>Message:</strong> {app.message}</p>
+              <p><strong>Portfolio:</strong> <a href={app.portfolio} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{app.portfolio}</a></p>
+              <p><strong>Availability:</strong> {app.availability}</p>
+              <p><strong>Status:</strong> {app.status || 'Pending'}</p>
+              <div className="mt-2 flex gap-2">
+                <button
+                  onClick={() => handleStatusChange(job._id, app.user._id, 'Accepted')}
+                  className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${
+                    app.status === 'Accepted'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-green-100 text-green-700 hover:bg-green-200'
+                  }`}
+                >
+                  Accepted
+                </button>
+                <button
+                  onClick={() => handleStatusChange(job._id, app.user._id, 'Rejected')}
+                  className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${
+                    app.status === 'Rejected'
+                      ? 'bg-red-600 text-white'
+                      : 'bg-red-100 text-red-700 hover:bg-red-200'
+                  }`}
+                >
+                  Rejected
+                </button>
+                <button
+                  onClick={() => handleStatusChange(job._id, app.user._id, 'Pending')}
+                  className={`px-4 py-1.5 rounded-full text-sm font-semibold transition ${
+                    app.status === 'Pending'
+                      ? 'bg-yellow-500 text-white'
+                      : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                  }`}
+                >
+                  Pending
+                </button>
               </div>
+
+              {/* Chat Button for Accepted Applicants */}
+              {app.status === 'Accepted' && (
+                <button
+                  onClick={() => handleChatClick(app.user._id)}  // Start chat with the applicant
+                  className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                >
+                  💬 Start Chat
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-gray-400 italic">No applicants yet.</p>
+      )}
+    </div>
+  )}
+</div>
+
             ))
           ) : (
             <p className="text-gray-500">You haven’t posted any jobs yet.</p>
           )}
         </div>
       </div>
+
+      {/* Chat Modal */}
+      {isChatModalOpen && (
+        <div
+          onClick={() => setIsChatModalOpen(false)}
+          className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-lg w-full bg-white dark:bg-gray-800 p-6 rounded shadow text-gray-800 dark:text-white"
+          >
+            <h2 className="text-xl font-bold mb-4 text-center text-indigo-600 dark:text-indigo-300">
+              Chat
+            </h2>
+
+            {/* User List */}
+            {/* <div className="mb-4">
+              <h3 className="text-lg font-semibold text-center mb-2">Select a User to Chat</h3>
+              <ul className="space-y-2">
+                {users.map((user) => (
+                  <li
+                    key={user._id}
+                    onClick={() => handleChatClick(user)}
+                    className="cursor-pointer hover:bg-gray-200 p-2 rounded"
+                  >
+                    {user.name}
+                  </li>
+                ))}
+              </ul>
+            </div> */}
+
+            {/* Messages */}
+            {chatWithUser && (
+              <div className="h-64 overflow-auto border p-4 rounded bg-gray-100 dark:bg-gray-700">
+                {messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`mb-2 flex ${msg.from === user._id ? 'justify-start' : 'justify-end'}`}
+                  >
+                    <div
+                      className={`max-w-xs px-4 py-2 rounded-lg ${msg.from === user._id ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'}`}
+                    >
+                      <strong>{msg.from === user._id ? 'You' : chatWithUser.name}:</strong>
+                      <div>{msg.content}</div>
+                      <small className="block text-xs text-gray-500">{new Date(msg.timestamp).toLocaleString()}</small>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Message Input */}
+            {chatWithUser && (
+              <div className="mt-4">
+                <textarea
+                  className="w-full p-2 rounded border dark:bg-gray-700 dark:border-gray-600"
+                  placeholder={`Type your message to ${users?.[0]?.name}...`}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+                <button
+                  className="mt-2 w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+                  onClick={handleSendMessage}
+                >
+                  Send
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

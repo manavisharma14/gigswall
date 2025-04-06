@@ -17,6 +17,7 @@
     "dompurify": "^3.2.5",
     "firebase": "^11.5.0",
     "framer-motion": "^12.6.3",
+    "googleapis": "^148.0.0",
     "marked": "^15.0.7",
     "pdfjs-dist": "^3.11.174",
     "react": "^19.0.0",

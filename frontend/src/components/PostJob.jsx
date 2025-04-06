@@ -162,21 +162,18 @@ function PostJob() {
           </div>
         )}
 
-        {showAppliedAlert && (
-          <div onClick={() => setShowAppliedAlert(false)} className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
-            <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-gray-800 text-center px-6 py-4 rounded-xl shadow-xl border border-purple-300 text-purple-700 dark:text-purple-300 font-medium text-lg">
-              You've already applied to this job!
+  {showAppliedAlert && (
+            <div className="fixed top-6 right-6 bg-purple-100 text-purple-700 px-4 py-2 rounded shadow-lg z-50">
+              ❗ You’ve already applied to this gig!
             </div>
-          </div>
-        )}
+          )}
 
-        {showSuccessModal && (
-          <div onClick={() => setShowSuccessModal(false)} className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
-            <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-gray-800 text-center px-6 py-4 rounded-xl shadow-xl border border-green-300 text-green-700 dark:text-green-300 font-medium text-lg">
-              You have successfully applied to this job!
+          {/* SUCCESS MODAL */}
+          {showSuccessModal && (
+            <div className="fixed top-6 right-6 bg-green-100 text-green-700 px-4 py-2 rounded shadow-lg z-50">
+              🎉 Successfully applied!
             </div>
-          </div>
-        )}
+          )}
 
         {/* CREATE GIG MODAL */}
 {showModal && (

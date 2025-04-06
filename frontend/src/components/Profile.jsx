@@ -143,6 +143,12 @@ function Profile() {
                         job.applicants?.find(app => app.user === user?._id)?.status || 'Pending'
                       }
                     </p>
+                    {job.applicants?.find(app => app.user === user?._id)?.status === 'Accepted' && (
+  <div className="mt-4">
+    <Chat jobId={job._id} userId={user._id} />
+  </div>
+)}
+
                   </div>
                 ))
               ) : (

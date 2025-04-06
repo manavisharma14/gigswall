@@ -30,28 +30,26 @@ app.use('/api/auth', uploadRoutes);
 io.on('connection', (socket) => {
   console.log('⚡ User connected:', socket.id);
 
-  socket.on('join-room', ({ room }) => {
-    socket.join(room);
-    console.log(`🟢 Joined room: ${room}`);
+  socket.on('join-room', ({ roomId }) => {
+    socket.join(roomId);
+    console.log(`🟢 Joined room: ${roomId}`);
   });
 
-  socket.on('chat-message', ({ room, msg }) => {
-    io.to(room).emit('chat-message', msg);
+  socket.on('message', ({ roomId, text, sender }) => {
+    console.log(`💬 Message in ${roomId} from ${sender}: ${text}`);
+    socket.to(roomId).emit('message', { text, sender });
   });
 
-  socket.on('leave-room', ({ room }) => {
-    socket.leave(room);
-    console.log(`🔴 Left room: ${room}`);
-  });
-
-  socket.on('gig-accepted', ({ jobId, userId }) => {
-    io.emit('start-chat', { jobId, userId });
+  socket.on('leave-room', ({ roomId }) => {
+    socket.leave(roomId);
+    console.log(`🔴 Left room: ${roomId}`);
   });
 
   socket.on('disconnect', () => {
     console.log('❌ User disconnected:', socket.id);
   });
 });
+
 
 
 const PORT = process.env.PORT || 5000;

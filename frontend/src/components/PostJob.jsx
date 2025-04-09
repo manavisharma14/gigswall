@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { generateJobDescription } from '../geminiClient';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import ReactGA from '../analytics'
+
 
 function PostJob() {
   const url = "https://peergigbe.onrender.com";
@@ -57,6 +59,13 @@ function PostJob() {
       });
       const data = await res.json();
       if (res.ok) {
+
+        ReactGA.event({
+          category: 'Jobs',
+          action: 'Posted a Job',
+          label: newJob.title,
+        });
+
         setJobs([data, ...jobs]);
         setNewJob({ title: '', desc: '', budget: '', skills: '', timeline: '' });
         setShowModal(false);
@@ -67,6 +76,9 @@ function PostJob() {
       console.error('Post job error:', err);
       alert('Server error while posting job');
     }
+
+
+
   };
 
   const handleApplyClick = (job) => {
@@ -95,6 +107,13 @@ function PostJob() {
       );
       const data = await res.json();
       if (res.ok) {
+
+        ReactGA.event({
+          category: 'Applications',
+          action: 'Applied to Job',
+          label: applyModal.title,
+        });
+        
         setApplyModal(null);
         setShowSuccessModal(true);
         setApplication({ message: '', portfolio: '', availability: '' });

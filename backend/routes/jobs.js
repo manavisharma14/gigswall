@@ -44,7 +44,7 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ POST /api/jobs/:id/apply
+
 router.post('/:id/apply', authMiddleware, async (req, res) => {
   const userId = req.userId;
   const jobId = req.params.id;
@@ -72,7 +72,7 @@ router.post('/:id/apply', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ GET /api/jobs/applied → get all jobs this user has applied for
+
 router.get('/applied', authMiddleware, async (req, res) => {
   try {
     const jobs = await Job.find({ 'applicants.user': req.userId });
@@ -83,7 +83,7 @@ router.get('/applied', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ GET posted jobs with responses
+
 router.get('/posted/responses', authMiddleware, async (req, res) => {
   try {
     const jobs = await Job.find({ createdBy: req.userId }).populate({
@@ -98,7 +98,7 @@ router.get('/posted/responses', authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ PATCH application status
+
 router.patch('/:jobId/applications/:userId/status', authMiddleware, async (req, res) => {
   const { jobId, userId } = req.params;
   const { status } = req.body;

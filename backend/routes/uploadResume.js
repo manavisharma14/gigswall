@@ -1,4 +1,4 @@
-// backend/routes/uploadResume.js
+
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const router = express.Router();
 
-// Set up Multer storage
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadsPath = path.join(__dirname, '..', 'uploads');
@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Route to upload resume
+
 router.post('/upload-resume', authMiddleware, upload.single('resume'), (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });

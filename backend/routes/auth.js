@@ -3,9 +3,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/authMiddleware');
 const router = express.Router();
-const admin = require('../firebase'); // or wherever you put your firebase.js
+const admin = require('../firebase'); 
 
-// 🔐 Register
+
 router.post('/register', async (req, res) => {
   console.log('Register body:', req.body);
   const { name, email, password, department, gender } = req.body;
@@ -26,7 +26,7 @@ const newUser = await User.create({ name, email, password, department, gender })
   }
 });
 
-// 🔑 Login
+
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -44,10 +44,10 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// 🧑‍💼 Add this route to return profile info
+
 router.get('/profile', authMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('-password'); // Exclude password
+    const user = await User.findById(req.userId).select('-password'); 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     res.json(user);
@@ -58,7 +58,7 @@ router.get('/profile', authMiddleware, async (req, res) => {
 });
 router.get('/users', async (req, res) => {
   try {
-    const users = await User.find(); // Exclude password
+    const users = await User.find(); 
     if (!users) return res.status(404).json({ message: 'User not found' });
 
     res.json(users);
@@ -71,18 +71,18 @@ router.post('/google', async (req, res) => {
   const { idToken , displayName} = req.body;
 
   try {
-    // Verify Firebase ID token
+
     const decoded = await admin.auth().verifyIdToken(idToken);
     const { email, uid } = decoded;
     console.log("HELLO1", email, uid, displayName)
 
-    // Check or create user in your DB
+
     let user = await User.findOne({ email });
     if (!user) {
-      user = await User.create({ email, firebaseUid: uid, name:displayName }); // You can store Firebase UID too
+      user = await User.create({ email, firebaseUid: uid, name:displayName }); 
     }
     console.log("HELLO2", user)
-    // Issue your app's JWT
+
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
     console.log("HELLLOOO", token)
     res.json({ token, user });
@@ -93,14 +93,14 @@ router.post('/google', async (req, res) => {
 });
 
 
-// Logout
+
 router.get('/logout', (req, res) => {
   req.logout(() => {
     res.send({ message: 'Logged out' });
   });
 });
 
-// Get current logged-in user
+
 router.get('/current-user', (req, res) => {
   res.send(req.user || null);
 });

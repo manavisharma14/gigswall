@@ -16,7 +16,7 @@ const JobSchema = new mongoose.Schema({
     portfolio: String,
     availability: String,
 
-    // 👇 Add this:
+
     status: {
       type: String,
       enum: ['Pending', 'Accepted', 'Rejected'],

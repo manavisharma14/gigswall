@@ -2,13 +2,12 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-  name: { type: String},               // ✅ New field
+  name: { type: String},            
   email: { type: String, required: true, unique: true },
   password: { type: String},
   department: { type: String }      ,        
   googleId: { type: String }, // Google users only
-  // ✅ New field
-  // In models/User.js
+
 gender: { type: String, enum: ['male', 'female', 'other'], default: 'other' }
 
 });

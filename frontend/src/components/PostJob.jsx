@@ -1,4 +1,3 @@
-// PostJob.jsx
 import React, { useState, useEffect } from 'react';
 import { generateJobDescription } from '../geminiClient';
 import { marked } from 'marked';
@@ -121,7 +120,7 @@ function PostJob() {
         setApplyModal(null);
         setShowAppliedAlert(true);
       } else {
-        alert(data.message || '❌ Failed to apply');
+        alert(data.message || 'Failed to apply');
       }
     } catch (err) {
       console.error(err);
@@ -187,14 +186,12 @@ function PostJob() {
             </div>
           )}
 
-          {/* SUCCESS MODAL */}
           {showSuccessModal && (
             <div className="fixed top-6 right-6 bg-green-100 text-green-700 px-4 py-2 rounded shadow-lg z-50">
-              🎉 Successfully applied!
+              Successfully applied!
             </div>
           )}
 
-        {/* CREATE GIG MODAL */}
 {showModal && (
   <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
     <div className="bg-white dark:bg-gray-800 p-10 rounded-2xl w-full max-w-3xl relative shadow-2xl">
@@ -221,7 +218,6 @@ function PostJob() {
           />
         ))}
 
-        {/* Description + AI generation */}
         <div className="relative">
           <textarea
             name="desc"
@@ -265,7 +261,6 @@ function PostJob() {
 )}
 
 
-        {/* DESCRIPTION MODAL */}
         {descModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
             <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-xl relative overflow-y-auto max-h-[90vh] w-full max-w-2xl border border-purple-300 dark:border-purple-600">
@@ -289,7 +284,6 @@ function PostJob() {
         )}
 
 
-        {/* APPLY MODAL */}
         {applyModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
             <div className="bg-white dark:bg-gray-900 max-w-md w-full p-6 rounded-2xl shadow-xl relative">
@@ -323,7 +317,7 @@ function PostJob() {
                     );
                     const data = await res.json();
                     if (res.ok) {
-                      alert('✅ Application submitted!');
+                      alert(' Application submitted!');
                       setApplyModal(null);
                       setApplication({
                         message: '',
@@ -331,7 +325,7 @@ function PostJob() {
                         availability: '',
                       });
                     } else {
-                      alert(data.message || '❌ Failed to apply');
+                      alert(data.message || ' Failed to apply');
                     }
                   } catch (err) {
                     console.error(err);

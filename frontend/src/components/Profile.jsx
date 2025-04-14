@@ -1,7 +1,6 @@
-// Profile.jsx with all Chat and Socket.io references removed
 import React, { useEffect, useState } from 'react';
-import { io } from 'socket.io-client'; // Import Socket.io client
-const socket = io('https://peergigbe.onrender.com'); // Connect to the backend server
+import { io } from 'socket.io-client'; 
+const socket = io('https://peergigbe.onrender.com'); 
 
 function Profile() {
   const url = "https://peergigbe.onrender.com";
@@ -45,24 +44,16 @@ function Profile() {
 
     if (isChatModalOpen) {
 
-      // fetch(url + '/api/auth/profile', {
-      //   headers: { Authorization: `Bearer ${token}` },
-      // })
-      //   .then((res) => res.json())
-      //   .then((data) => {
-      //     setUsers([data]); // Exclude current user
-      //   })        
-      //   .catch((err) => console.error('Error fetching profile:', err));
 
 
-      fetch(url + '/api/auth/users') // Adjust your endpoint
+
+      fetch(url + '/api/auth/users') 
         .then((response) => response.json())
         .then((data) => {
-          setUsers(data.filter(user => user._id === chatUser)); // Exclude current user
+          setUsers(data.filter(user => user._id === chatUser)); 
         })
         .catch((error) => console.error('Error fetching users:', error));
 
-      // console.log(users, chatUser);
     }
   }, [isChatModalOpen]);
   useEffect(()=>{
@@ -104,29 +95,27 @@ function Profile() {
   const handleSendMessage = () => {
     if (message.trim()) {
       const newMessage = {
-        from: user._id, // Send the user's ID
-        to: chatWithUser, // Send the recipient's ID
+        from: user._id, 
+        to: chatWithUser, 
         content: message,
         timestamp: new Date().toISOString(),
       };
 
-      // Emit message to server
-      socket.emit('sendMessage', newMessage); 
-      setMessage(''); // Clear message input
 
-      // Update local messages list (this is for showing the sent message in real-time)
+      socket.emit('sendMessage', newMessage); 
+      setMessage(''); 
+
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     }
   };
 
   const handleChatClick = (user) => {
-    console.log(`Starting chat with user ID: ${user}`); // Ensure user._id is passed correctly
+    console.log(`Starting chat with user ID: ${user}`); 
     setIsChatModalOpen(!isChatModalOpen);
-    setMessages([]); // Clear messages when closing modal
-    setChatWithUser(user); // Set the user to chat with
+    setMessages([]); 
+    setChatWithUser(user); 
     setChatUser(user);
     
-    // Fetch previous messages between the current user and the user who created the job
     fetch(url + `/api/messages/${user}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -207,7 +196,6 @@ function Profile() {
                       <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
                         📌 <strong>Status:</strong> {applicant?.status || 'Pending'}
                       </p>
-                      {/* Check if the applicant's status is "Accepted" and show the chat button */}
                     {job.applicants?.some(app => app.user === user?._id && app.status === 'Accepted') && (
                       <button
                         onClick={() => handleChatClick(job.createdBy)}  
@@ -290,10 +278,9 @@ function Profile() {
                 </button>
               </div>
 
-              {/* Chat Button for Accepted Applicants */}
               {app.status === 'Accepted' && (
                 <button
-                  onClick={() => handleChatClick(app.user._id)}  // Start chat with the applicant
+                  onClick={() => handleChatClick(app.user._id)}  
                   className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
                 >
                   💬 Start Chat
@@ -316,7 +303,6 @@ function Profile() {
         </div>
       </div>
 
-      {/* Chat Modal */}
       {isChatModalOpen && (
         <div
           onClick={() => setIsChatModalOpen(false)}
@@ -357,7 +343,6 @@ function Profile() {
                     <div
                       className={`max-w-xs px-4 py-2 rounded-lg ${msg.from === user._id ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'}`}
                     >
-                      {/* <strong>{msg.from === user._id ? 'You' : chatWithUser.name}:</strong> */}
                       <div>{msg.content}</div>
                       <small className="block text-xs text-gray-500">{new Date(msg.timestamp).toLocaleString()}</small>
                     </div>
@@ -366,7 +351,6 @@ function Profile() {
               </div>
             )}
 
-            {/* Message Input */}
             {chatWithUser && (
               <div className="mt-4">
                 <textarea

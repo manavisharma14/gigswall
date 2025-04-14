@@ -57,7 +57,6 @@ function PeerMeet() {
           <p>"I don’t know how to build a web app."</p>
         </motion.div>
 
-        {/* Message 2 - Right */}
         <motion.div
           className="p-3 bg-green-500 text-white rounded-lg shadow-lg w-fit max-w-sm self-end mr-20"
           initial={{ opacity: 0 }}
@@ -67,7 +66,6 @@ function PeerMeet() {
           <p>"I can build a web app for you! I've done it before."</p>
         </motion.div>
 
-        {/* Message 3 - Left */}
         <motion.div
           className="p-3 bg-blue-500 text-white rounded-lg shadow-lg w-fit max-w-sm"
           initial={{ opacity: 0 }}
@@ -77,7 +75,6 @@ function PeerMeet() {
           <p>"Oh, that’s great! How much would it cost?"</p>
         </motion.div>
 
-        {/* Message 4 - Right */}
         <motion.div
           className="p-3 bg-green-500 text-white rounded-lg shadow-lg w-fit max-w-sm self-end mr-20"
           initial={{ opacity: 0 }}

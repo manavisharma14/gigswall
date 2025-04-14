@@ -1,4 +1,3 @@
-// frontend/src/geminiClient.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI("AIzaSyDZbL0-y5_H01wLmzsGJipm9MI-xQ083ng");

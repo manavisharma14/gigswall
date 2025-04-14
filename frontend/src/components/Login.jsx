@@ -14,7 +14,6 @@ function Login({ closeModal, switchToRegister, onLoginSuccess }) {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // const url = "http://localhost:5001"; // 🔁 Update this to your production URL later
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,12 +28,12 @@ function Login({ closeModal, switchToRegister, onLoginSuccess }) {
       const data = await res.json();      
       if (res.ok) {
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user)); // ✅ Save full user object
+        localStorage.setItem('user', JSON.stringify(data.user)); 
         setSuccessMsg('🎉 Yay! You are now logged in.');
         setTimeout(() => {
-          onLoginSuccess(); // Close modal and redirect
+          onLoginSuccess(); 
         }, 1500);
-        // window.location.reload(); // Optional
+
 
       } else {
         alert(data.message || 'Login failed');
@@ -65,12 +64,12 @@ function Login({ closeModal, switchToRegister, onLoginSuccess }) {
 
       if (res.ok) {
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user)); // ✅ Save full user from backend
+        localStorage.setItem('user', JSON.stringify(data.user)); 
         setSuccessMsg('🎉 Yay! You are now logged in.');
         setTimeout(() => {
-          onLoginSuccess(); // Close modal and redirect
+          onLoginSuccess(); 
         }, 1500);
-        // window.location.reload(); // Optional
+
       } else {
         alert(data.message || 'Login failed');
       }

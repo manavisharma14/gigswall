@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { io } from 'socket.io-client'; // Import Socket.io client
+import { io } from 'socket.io-client'; 
 import { Link, useNavigate } from 'react-router-dom';
 import Login from './Login';
 import Register from './Register';
 
-const socket = io('https://peergigbe.onrender.com'); // Connect to the backend server
+const socket = io('https://peergigbe.onrender.com'); 
 
 function Navbar({ toggleTheme, darkMode }) {
   const url = "https://peergigbe.onrender.com"
@@ -13,15 +13,15 @@ function Navbar({ toggleTheme, darkMode }) {
   const [modalType, setModalType] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogoutToast, setShowLogoutToast] = useState(false);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false); // State for login prompt
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false); 
   const [jobs, setJobs] = useState([]);
 
   const [currentUser, setCurrentUser] = useState(null);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
-  const [messages, setMessages] = useState([]); // Store messages
-  const [message, setMessage] = useState(''); // Store current message input
-  const [users, setUsers] = useState([]); // Store all users
-  const [chatWithUser, setChatWithUser] = useState(null); // Store the user to chat with
+  const [messages, setMessages] = useState([]); 
+  const [message, setMessage] = useState(''); 
+  const [users, setUsers] = useState([]);
+  const [chatWithUser, setChatWithUser] = useState(null); 
   const navigate = useNavigate();
   useEffect(() => {
     console.log("jobs", jobs)
@@ -45,39 +45,35 @@ function Navbar({ toggleTheme, darkMode }) {
   }, []);
   
 
-  // Effect to handle socket connection and registration
   useEffect(() => {
     if (currentUser) {
       socket.emit('registerUser', currentUser._id);
     }
 
-    // Listen for incoming messages
     socket.on('receiveMessage', (newMessage) => {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
 
     return () => {
-      socket.off('receiveMessage'); // Cleanup on unmount
+      socket.off('receiveMessage'); 
     };
-  }, [currentUser]); // Only re-run when currentUser changes
+  }, [currentUser]); 
 
   useEffect(() => {
-    // Fetch all users when the chat modal is opened
     if (isChatModalOpen) {
-      fetch(url + '/api/auth/users') // Adjust your endpoint
+      fetch(url + '/api/auth/users') 
         .then((response) => response.json())
         .then((data) => {
-          setUsers(data.filter(user => user._id !== currentUser._id)); // Exclude current user
+          setUsers(data.filter(user => user._id !== currentUser._id)); 
         })
         .catch((error) => console.error('Error fetching users:', error));
     }
-  }, [isChatModalOpen, currentUser]); // Fetch users only when modal is open or currentUser changes
-
+  }, [isChatModalOpen, currentUser]); 
   const handlePostJobClick = () => {
     if (!isLoggedIn) {
-      // Show login prompt if not logged in
+
       setShowLoginPrompt(true);
-      setTimeout(() => setShowLoginPrompt(false), 3000); // Hide after 3 seconds
+      setTimeout(() => setShowLoginPrompt(false), 3000); 
       return;
     }    
     
@@ -107,39 +103,36 @@ function Navbar({ toggleTheme, darkMode }) {
 
   const toggleChatModal = () => {
     setIsChatModalOpen(!isChatModalOpen);
-    setMessages([]); // Clear messages when closing modal
-    setChatWithUser(null); // Reset chat target
+    setMessages([]); 
+    setChatWithUser(null); 
   };
 
   const handleSendMessage = () => {
     if (message.trim() && chatWithUser) {
       const newMessage = {
-        from: currentUser._id, // Send the user's ID
-        to: chatWithUser._id, // Send the recipient's ID
+        from: currentUser._id, 
+        to: chatWithUser._id, 
         content: message,
         timestamp: new Date().toISOString(),
       };
 
-      socket.emit('sendMessage', newMessage); // Emit message to server
-      setMessage(''); // Clear message input
+      socket.emit('sendMessage', newMessage); 
+      setMessage(''); 
 
-      // Update local messages list (this is for showing the sent message in real-time)
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     }
   };
 
   const handleLoginSuccess = (user) => {
-    // Update the currentUser and isLoggedIn state when login is successful
     setCurrentUser(user);
     setIsLoggedIn(true);
     setModalType(null);
   };
 
   const handleUserSelect = (user) => {
-    setChatWithUser(user); // Set the user to chat with
-    setMessages([]); // Clear previous messages
+    setChatWithUser(user); 
+    setMessages([]);
 
-    // Fetch previous messages between the users from the backend
     fetch(url + `/api/messages/${user._id}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -161,17 +154,13 @@ function Navbar({ toggleTheme, darkMode }) {
           <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">PeerGig</h1>
         </div>
 
-        {/* Navigation Links */}
         <div className="space-x-4 flex items-center">
           <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300">Home</Link>
           <button onClick={handlePostJobClick} className="hover:text-gray-600 dark:hover:text-gray-300">Post Job</button>
-          {/* <Link to="/applied" className="hover:text-gray-600 dark:hover:text-gray-300">Applied Jobs</Link> */}
           <Link to="/contact" className="hover:text-gray-600 dark:hover:text-gray-300">Contact</Link>
-        {/* Conditional "My Profile" Link */}
         {isLoggedIn && (
             <Link to="/profile" className="hover:text-gray-600 dark:hover:text-gray-300">My Profile</Link>
         )}
-          {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
             className="text-xl hover:text-gray-500 transition"
@@ -180,7 +169,6 @@ function Navbar({ toggleTheme, darkMode }) {
             {darkMode ? '🌞' : '🌙'}
           </button>
 
-          {/* Auth Buttons */}
           {!isLoggedIn ? (
             <button
               onClick={() => setModalType('login')}
@@ -199,26 +187,22 @@ function Navbar({ toggleTheme, darkMode }) {
             </button>
           )}
 
-          {/* Chat Button */}
           
         </div>
       </div>
 
-      {/* Toast on Logout */}
       {showLogoutToast && (
               <div className="absolute top-24 right-6 bg-red-100 border border-red-400 text-red-800 px-4 py-2 rounded-lg shadow-lg animate-slide-in-down z-50">
                 👋 You’ve been logged out.
               </div>
             )}
 
-      {/* Login Prompt Toast */}
       {showLoginPrompt && (
         <div className="absolute top-24 right-6 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-lg shadow-lg animate-slide-in-down z-50">
           ⚠️ Please log in to create a gig.
         </div>
       )}
 
-      {/* Modals */}
       {modalType === 'login' && (
         <Login
           closeModal={() => setModalType(null)}
@@ -274,7 +258,6 @@ function Navbar({ toggleTheme, darkMode }) {
               </ul>
             </div>
 
-            {/* Messages */}
             { chatWithUser && (
               <div className="h-64 overflow-auto border p-4 rounded bg-gray-100 dark:bg-gray-700">
               {
@@ -298,7 +281,6 @@ function Navbar({ toggleTheme, darkMode }) {
             
 
 
-            {/* Message Input */}
             {chatWithUser && (
               <div className="mt-4">
                 <textarea

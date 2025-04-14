@@ -6,7 +6,7 @@ import { useInView } from 'react-intersection-observer';
 
 function About() {
   const { ref, inView } = useInView({
-    triggerOnce: false,  // 👈 re-trigger every time it's in view
+    triggerOnce: false,  
     threshold: 0.2,
   });
   
@@ -18,7 +18,7 @@ function About() {
       className="min-h-screen py-24 px-6 flex items-center justify-center bg-white dark:bg-gray-900 text-black dark:text-white transition-colors duration-300"
     >
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
-        {/* Text Left */}
+
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={inView ? { opacity: 1, x: 0 } : {}}
@@ -38,7 +38,7 @@ function About() {
           </p>
         </motion.div>
 
-        {/* Image Right */}
+
         <motion.img
           src={peers}
           alt="Peers working together"

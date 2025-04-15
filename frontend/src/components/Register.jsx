@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 
 function Register({ closeModal, switchToLogin, onRegisterSuccess }) {
 
-  const url = "https://peergigbe.onrender.com"
-  //  const url = "http://localhost:5001"
+  const url = import.meta.env.VITE_API_URL;
+
 
   const [form, setForm] = useState({
     name: '',

@@ -6,8 +6,8 @@ import ReactGA from '../analytics'
 
 
 function PostJob() {
-  const url = "https://peergigbe.onrender.com";
-  // const url = "http://localhost:5001"
+  const url = import.meta.env.VITE_API_URL;
+
 
   const [jobs, setJobs] = useState([]);
   const [newJob, setNewJob] = useState({

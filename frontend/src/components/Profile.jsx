@@ -3,8 +3,8 @@ import { io } from 'socket.io-client';
 const socket = io('https://peergigbe.onrender.com'); 
 
 function Profile() {
-  const url = "https://peergigbe.onrender.com";
-  // const url = "http://localhost:5001"  
+  const url = import.meta.env.VITE_API_URL;
+
   
   const [user, setUser] = useState(null);
   const [appliedJobs, setAppliedJobs] = useState([]);

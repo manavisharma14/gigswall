@@ -4,8 +4,8 @@ import { signInWithPopup } from 'firebase/auth';
 
 function Login({ closeModal, switchToRegister, onLoginSuccess }) {
 
-  const url = "https://peergigbe.onrender.com"
-  // const url = "http://localhost:5001"
+  const url = import.meta.env.VITE_API_URL;
+
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [successMsg, setSuccessMsg] = useState('');

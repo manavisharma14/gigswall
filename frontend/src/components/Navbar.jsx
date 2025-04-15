@@ -7,8 +7,8 @@ import Register from './Register';
 const socket = io('https://peergigbe.onrender.com'); 
 
 function Navbar({ toggleTheme, darkMode }) {
-  const url = "https://peergigbe.onrender.com"
-  // const url = "http://localhost:5001"
+  const url = import.meta.env.VITE_API_URL;
+
 
   const [modalType, setModalType] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);

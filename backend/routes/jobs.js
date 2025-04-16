@@ -1,10 +1,10 @@
-// backend/routes/jobs.js
+
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
 const Job = require('../models/Job');
 
-// ✅ GET all jobs (no auth needed)
+
 router.get('/', async (req, res) => {
   try {
     const jobs = await Job.find().sort({ createdAt: -1 });
@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ✅ POST a new job (auth required)
+
 router.post('/', authMiddleware, async (req, res) => {
   console.log('📥 POST /api/jobs hit');
   console.log('➡️  Request body:', req.body);
